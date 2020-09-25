@@ -34,12 +34,12 @@ public class MainViewController implements Initializable{
 
 	@FXML
 	public void onMenuItemDepartmentAction() { // Na ação do botão, ele irá imprimir o texto abaixo
-		System.out.println("onMenuItemDepartmentAction");
+		loadview("/gui/DepartmentList.fxml"); // Item e caminho indicado. Será a janela que irá aparecer ao clicar no botão
 	}	
 	
 	@FXML
 	public void onMenuItemAboutAction() { // Na ação do botão, ele irá abrir o item indicado
-		loadview("/gui/About.fxml"); // Item e caminho indicado.
+		loadview("/gui/About.fxml"); // Item e caminho indicado. Será a janela que irá aparecer ao clicar no botão
 	}	
 	
 	@Override
