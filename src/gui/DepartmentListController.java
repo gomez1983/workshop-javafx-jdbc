@@ -1,18 +1,27 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.util.Alerts;
+import gui.util.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
@@ -37,8 +46,9 @@ public class DepartmentListController implements Initializable {
 	private ObservableList<Department> obsList; // Os departamentos são carregados aqui
 
 	@FXML
-	public void onBtNewAction() {
-		System.out.println("onBtNewAction");
+	public void onBtNewAction(ActionEvent event) { // Evento que dá condição de acesso ao stage
+		Stage parentStage = Utils.currentStage(event); // Referência para o Stage atual
+		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
 	}
 
 //--Dependência de DepartmentService-- Inversão de controle	
@@ -74,4 +84,24 @@ public class DepartmentListController implements Initializable {
 		obsList = FXCollections.observableArrayList(list); // Instancia os dados originais
 		tableViewDepartment.setItems(obsList);
 	}
+	
+	private void createDialogForm(String absoluteName, Stage parentStage) { // Quando criamos uma janela de diálogo, temos que informar pra ela quem que é o stage que criou essa janela
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load(); // Carrega o painel
+			
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Enter Department data");
+			dialogStage.setScene(new Scene(pane)); // Elemento raiz da cena é "pane"
+			dialogStage.setResizable(false); // Janela não poderá ser redimensionada
+			dialogStage.initOwner(parentStage); // Função que define quem é o stage pai dessa janela
+			dialogStage.initModality(Modality.WINDOW_MODAL); // Ela é modal. Ficará travada
+			dialogStage.showAndWait();
+			
+		}
+		catch (IOException e) {
+			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+		}
+	}
+	
 }
