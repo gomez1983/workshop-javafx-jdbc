@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import javafx.collections.FXCollections;
@@ -26,7 +27,7 @@ import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
 
-public class DepartmentListController implements Initializable {
+public class DepartmentListController implements Initializable, DataChangeListener {
 
 	private DepartmentService service;
 
@@ -37,8 +38,7 @@ public class DepartmentListController implements Initializable {
 	private TableColumn<Department, Integer> tableColumnId; // Referência para o Id do tableColumnId. Por isso o Integer
 
 	@FXML
-	private TableColumn<Department, String> tableColumnName; // Referência para o Name do tableColumnId. Por isso o
-																// String
+	private TableColumn<Department, String> tableColumnName; // Referência para o Name do tableColumnId. Por isso o string
 
 	@FXML
 	private Button btNew; // Referência para o botão new em "Department"
@@ -95,6 +95,7 @@ public class DepartmentListController implements Initializable {
 			DepartmentFormController controller = loader.getController();
 			controller.setDepartment(obj); // Injeta nesse controlador o departamento
 			controller.setDepartmentService(new DepartmentService());
+			controller.subscribeDataChangeListener(this); // Se inscreve para receber o evento
 			controller.updateFormData(); // Método para carregar os dados desse objeto no formulário		
 			
 			Stage dialogStage = new Stage();
@@ -109,6 +110,12 @@ public class DepartmentListController implements Initializable {
 		catch (IOException e) {
 			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
+	}
+
+	@Override
+	public void onDataChanged() { // Notificação de dados alterados
+		updateTableView(); // Função que atualiza os dados da tabela alterados.
+		
 	}
 	
 }
