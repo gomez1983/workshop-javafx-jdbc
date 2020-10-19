@@ -139,9 +139,7 @@ public class DepartmentFormController implements Initializable {
 		if(fields.contains("name")) { // Se existir a chave "name"...
 			labelErrorName.setText(errors.get("name")); // Pega a mensagem correspondente ao campo name e seta ela em "labelErrorName".
 		}
-		
 	}
-	
 }
 
 
