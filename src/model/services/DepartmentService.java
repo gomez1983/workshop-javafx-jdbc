@@ -22,4 +22,9 @@ public class DepartmentService {
 			dao.update(obj); // Atualiza
 		}
 	}
+	
+	public void remove(Department obj) { //Método para remover um departamento do Banco de Dados.
+		dao.deleteById(obj.getId());
+	}
+	
 }

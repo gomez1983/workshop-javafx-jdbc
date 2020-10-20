@@ -3,9 +3,11 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import application.Main;
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
@@ -19,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,7 +46,10 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	private TableColumn<Department, String> tableColumnName; // Referência para o Name do tableColumnId. Por isso o string
 
 	@FXML
-	private TableColumn<Department, Department> tableColumnEDIT;
+	private TableColumn<Department, Department> tableColumnEDIT; // Botão de edição
+	
+	@FXML
+	private TableColumn<Department, Department> tableColumnREMOVE; // Botão de deletar
 	
 	@FXML
 	private Button btNew; // Referência para o botão new em "Department"
@@ -90,6 +96,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		obsList = FXCollections.observableArrayList(list); // Instancia os dados originais
 		tableViewDepartment.setItems(obsList);
 		initEditButtons(); // Acrescenta um novo botão com o texto "edit" em cada linha da tabela
+		initRemoveButtons(); // Acrescenta um novo botão com o texto "remove" em cada linha da tabela
 	}
 	
 	private void createDialogForm(Department obj, String absoluteName, Stage parentStage) { // Quando criamos uma janela de diálogo, temos que informar pra ela quem que é o stage que criou essa janela
@@ -126,7 +133,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	private void initEditButtons() {
 		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 		tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
-			private final Button button = new Button("edit");
+			private final Button button = new Button("edit"); // Cria o botão "edit"
 	
 			@Override
 			protected void updateItem(Department obj, boolean empty) {
@@ -140,5 +147,40 @@ public class DepartmentListController implements Initializable, DataChangeListen
 					event -> createDialogForm(obj, "/gui/DepartmentForm.fxml",Utils.currentStage(event))); // Ao clicar no botão, ele abre um formulário de edição usando o "createDialogForm"
 			}
 		});
+	}
+	
+	private void initRemoveButtons() {
+		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
+			private final Button button = new Button("remove"); // Cria o botão "remove"
+		
+			@Override
+			protected void updateItem(Department obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(event -> removeEntity(obj)); // Função para remover
+			}
+		});
+	}
+
+	private void removeEntity(Department obj) {
+		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?"); // Criação do alerta para deletar. A resposta desse "Alert" fica armazenada no "result"
+		
+		if (result.get() == ButtonType.OK) { // Significa que se ele apertar "OK" ele confirmou a deleção.
+			if (service == null) {
+				throw new IllegalStateException("Service was null"); // Se passar por aqui, significa que o service foi instanciado
+			}
+			try {
+				service.remove(obj); // Resultado da confirmação. Ele removera;
+				updateTableView();
+			}
+		catch (DbIntegrityException e) {
+			Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
+			}
+		}
 	}
 }
