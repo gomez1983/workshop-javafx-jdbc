@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -41,6 +42,15 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private TableColumn<Seller, String> tableColumnName; // Referência para o Name do tableColumnId. Por isso o string
 
 	@FXML
+	private TableColumn<Seller, String> tableColumnEmail; // Referência para o Email
+	
+	@FXML
+	private TableColumn<Seller, Date> tableColumnBirthDate; // Referência para a data de nascimento
+	
+	@FXML
+	private TableColumn<Seller, Double> tableColumnBaseSalary; // Referência para o Salário
+	
+	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT; // Botão de edição
 	
 	@FXML
@@ -74,7 +84,15 @@ public class SellerListController implements Initializable, DataChangeListener {
 																				// colunas.
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("Name")); // Padrão para iniciar o comportamento
 																					// das colunas.
-
+		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		
+		tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		Utils.formatTableColumnDate(tableColumnBirthDate, "dd//MM/yyyy");
+		
+		tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
+		
+		
 		Stage stage = (Stage) Main.getMainScene().getWindow(); // Método para deixar os limites da tabela do tamanho
 																// adaptavel ao tamanho da janela do app. É feito um
 																// downCasting do Stage para referencia-lo.
